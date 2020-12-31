@@ -1,7 +1,10 @@
-import { TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [
@@ -10,22 +13,39 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'AngularBase'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('AngularBase');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    const fixtureElement = fixture.debugElement.nativeElement;
     fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('AngularBase app is running!');
   });
+
+  it('should create the app', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should match both password', async(() => {
+    let result = true;
+    let passwordElement = fixture.debugElement.query(By.css('input[type=password]')).nativeElement;
+    let verifypasswordElement = fixture.debugElement.query(By.css('input[id=verifyPassword]')).nativeElement;
+
+    const passwordValue = (passwordElement.value = 'passwordTest');
+    const verifypasswordValue = (verifypasswordElement.value = 'test');
+
+    passwordElement.dispatchEvent(new Event('input'));
+    verifypasswordElement.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    if (String(passwordValue) !== String(verifypasswordValue)) {
+      result = false;
+    }
+
+    if (!result) {
+      expect(fixture.debugElement.query(By.css('.error')).nativeElement).toBeTruthy();
+    } else {
+      expect(fixture.debugElement.query(By.css('.valid')).nativeElement).not.toBeTruthy();
+    }
+    
+  }));
+
 });
